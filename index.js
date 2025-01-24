@@ -4,12 +4,12 @@ const port = 3000;
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/buy-asset', (req, res) => {
     res.send('Hello World!');
     }
 );
 
-app.post('/post', (req, res) => {
+app.post('/sell-assets', (req, res) => {
     console.log(req.body);
     res.send('Post request received');
     }
