@@ -28,14 +28,35 @@ function getOutputAmount(amountIn, reserveIn, reserveOut) {
   return numerator / denominator;
 }
 
-// Get current ETH price in USDC
+// Get current ETH price in USDC with detailed pricing info
 app.get("/price/eth", (req, res) => {
-  const ethPrice = liquidityPool.USDC / liquidityPool.ETH;
+  // Calculate spot price (price for infinitesimally small trade)
+  const spotPrice = liquidityPool.USDC / liquidityPool.ETH / 1000000; // Convert to USDC decimals
+
+  // Calculate effective prices for different trade sizes
+  const tradeSizes = [0.1, 0.5, 1, 5, 10]; // ETH amounts
+  const priceImpact = tradeSizes.map((size) => {
+    const usdcOutput = getOutputAmount(
+      size,
+      liquidityPool.ETH,
+      liquidityPool.USDC
+    );
+    const effectivePrice = usdcOutput / (size * 1000000); // Convert to USDC decimals
+    const priceImpact = ((spotPrice - effectivePrice) / spotPrice) * 100;
+
+    return {
+      tradeSize: size,
+      effectivePrice: effectivePrice,
+      priceImpact: priceImpact.toFixed(2) + "%",
+    };
+  });
+
   res.json({
-    ethPrice: ethPrice / 1000, // Convert back from USDC's 6 decimals
+    spotPrice: spotPrice,
+    tradeImpact: priceImpact,
     poolStats: {
       ethReserve: liquidityPool.ETH,
-      usdcReserve: liquidityPool.USDC / 1000000, // Convert to human-readable USDC
+      usdcReserve: liquidityPool.USDC / 1000000,
       k: K,
     },
   });
