@@ -167,7 +167,7 @@ amountOut = (amountIn * 0.997 * reserveOut) / (reserveIn + amountIn * 0.997)
 ## Limitations
 
 1. Single trading pair (ETH/USDC)
-2. No persistence (state is lost on server restart)
+2. No persistence (state is lost on server restart) || can be improved by making a db
 3. No authentication/authorization
 4. No support for limit orders
 5. Simplified fee model
